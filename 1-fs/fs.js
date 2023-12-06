@@ -1,4 +1,4 @@
-#!
+#!/usr/bin/env node
 const {exit} = require('node:process')
 const fs = require('fs');
 const selection = process.argv[2];
