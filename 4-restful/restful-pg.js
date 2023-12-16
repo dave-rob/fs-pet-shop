@@ -23,6 +23,7 @@ async function getPet(id){
 app.use(express.json());
 app.use(basicAuth({
     users: { 'admin': 'meowmix'},
+    challenge: true,//gives popup if try to go to browser
     unauthorizedResponse: req => (`unauthorized!`)
 }))
 
@@ -94,6 +95,14 @@ app.patch('/pets/:id', async (req, res) => {
         res.status(400).send("Bad Request. Invalid Index");
     }
  })
+
+ app.get('*', (req, res, next) => {
+    next('Internal Server Error')
+})
+
+app.use((err, req, res, next) => {
+    res.status(500).send(err)
+})
 
 app.listen(3000, () => {
     console.log("server listening on port 3000");
