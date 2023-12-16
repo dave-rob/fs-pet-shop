@@ -21,6 +21,10 @@ async function getPet(id){
 }
 
 app.use(express.json());
+app.use(basicAuth({
+    users: { 'admin': 'meowmix'},
+    unauthorizedResponse: req => (`unauthorized!`)
+}))
 
 app.get("/pets", async (req, res) => {
     try{
