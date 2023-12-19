@@ -86,34 +86,68 @@ app.post('/pets/add', async (req, res) => {
     
 });
 
-app.patch('/pets/:id', async (req, res) => {
+app.post('/pets/:id/update', async (req, res) => {
     const { id } = req.params;
     const petData = req.body
     console.log(petData)
     try{
-        let updatedVar =''
+        //let updatedVar =''
         for (let keys in petData) {
-            console.log(keys, petData[keys], id);
-            await db.query(`UPDATE pets SET ${keys} = $1 WHERE id = $2;`, [petData[keys], id])
-            updatedVar+= keys + " "
+            if(petData[keys] != ''){
+                await db.query(`UPDATE pets SET ${keys} = $1 WHERE id = $2;`, [petData[keys], id])
+            }
+            //console.log(keys, petData[keys], id);
+            
+            //updatedVar+= keys + " "
         }
-        res.send(`${updatedVar} was updated!`)
+        //res.send(`${updatedVar} was updated!`)
+        res.redirect(`/pets/${id}`)
     } catch(err){
         console.error(err);
         res.status(400).send("Bad request. {Name: String, Age: Integer, Kind: String}")
     }   
 })
 
- app.delete('/pets/:id/', async (req, res) => {
+// app.patch('/pets/:id', async (req, res) => {
+//     const { id } = req.params;
+//     const petData = req.body
+//     console.log(petData)
+//     try{
+//         let updatedVar =''
+//         for (let keys in petData) {
+//             console.log(keys, petData[keys], id);
+//             await db.query(`UPDATE pets SET ${keys} = $1 WHERE id = $2;`, [petData[keys], id])
+//             updatedVar+= keys + " "
+//         }
+//         res.send(`${updatedVar} was updated!`)
+//     } catch(err){
+//         console.error(err);
+//         res.status(400).send("Bad request. {Name: String, Age: Integer, Kind: String}")
+//     }   
+// })
+
+
+app.get('/pets/:id/delete', async (req, res) => {
     const {id} = req.params;
     try{
         await db.query("DELETE FROM pets WHERE id = $1;", [id]);
-        res.send("Bye, Bye, Pet!");
+        res.redirect("/pets");
     } catch(err){
         console.error(err);
         res.status(400).send("Bad Request. Invalid Index");
     }
  })
+
+//  app.delete('/pets/:id/', async (req, res) => {
+//     const {id} = req.params;
+//     try{
+//         await db.query("DELETE FROM pets WHERE id = $1;", [id]);
+//         res.send("Bye, Bye, Pet!");
+//     } catch(err){
+//         console.error(err);
+//         res.status(400).send("Bad Request. Invalid Index");
+//     }
+//  })
 
  app.get('*', (req, res, next) => {
     next('Internal Server Error')

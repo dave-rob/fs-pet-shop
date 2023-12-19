@@ -8,7 +8,14 @@
     <h1><%= pet.name %></h1>
     <h2 style="text-align: center;">the <%= pet.kind %> is</h2>
     <p style="font-size: 144px; text-align: center;"><%= pet.age %></p>
-    <button type="submit">Update</button><button type="submit">Delete</button>
+    <p>Want to update or delete the pet?</p>
+    <form action="/pets/<%= pet.id %>/update" method="post" id="addPet">
+      <input type="text" name="name" autofocus placeholder="<%= locals.error ? error :  'Enter pet name'%>">
+      <input type="text" name="kind" autofocus placeholder="<%= locals.error ? error :  'Enter pet kind'%>">
+      <input type="text" name="age" autofocus placeholder="<%= locals.error ? error :  'Enter pet age'%>">
+      <button type="submit">Update</button>
+    </form>
+    <form action="/pets/<%= pet.id %>/delete" method="get"><button type="submit">Delete</button></form>
    
 </body>
 </html>
