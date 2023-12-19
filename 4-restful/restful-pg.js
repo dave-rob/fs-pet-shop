@@ -109,15 +109,18 @@ app.post('/pets/:id/update', async (req, res) => {
     const { id } = req.params;
     const petData = req.body
     //console.log(petData)
+    const allowedKeys = [ "name", "age", "kind" ];
     try{
-        for (let keys in petData) {
-            if(petData[keys] != ''){
+        for (let keys in petData) {console.log(keys);
+            if(petData[keys] != '' && allowedKeys.includes(keys) ){//
                 await db.query(`UPDATE pets SET ${keys} = $1 WHERE id = $2;`, [petData[keys], id])
+            } else{
+                throw new Error("Nice try SQL Injection!");
             }
         }
         res.redirect(`/pets/${id}`)
     } catch(err){
-        //console.error(err);
+        console.error(err);
         const pet = await getPet(id);
         res.render("pages/singlePet.ejs",{pet: pet[0], error:"Bad request. {Name: String, Kind: String, Age: Integer}"})
     }   
