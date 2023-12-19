@@ -19,8 +19,10 @@ async function getPet(id){
     const pet = result.rows;
     return pet;
 }
-
-app.use(express.json());
+app.set('view engine', 'ejs');
+app.use(express.urlencoded({ extended:true}));
+app.use(express.json())
+app.use(express.static("public"));
 app.use(basicAuth({
     users: { 'admin': 'meowmix'},
     challenge: true,//gives popup if try to go to browser
@@ -31,8 +33,23 @@ app.get("/pets", async (req, res) => {
     try{
        let result = await db.query("SELECT * FROM pets;");
         let pets = result.rows;
-        res.send(pets); 
+        res.render("pages/index.ejs", {pets: pets});
+        //res.send(pets); 
     } catch (err) {
+        console.error(err);
+        res.status(500).send("Internal Server Error!");
+    }
+    
+})
+
+app.get("/add", async (req, res) => {
+    try{
+       //let result = await db.query("SELECT * FROM pets;");
+        //let pets = result.rows;
+        res.render("pages/add.ejs", {response: ''});
+        //res.send(pets); 
+    } catch (err) {
+        console.error(err);
         res.status(500).send("Internal Server Error!");
     }
     
@@ -42,11 +59,12 @@ app.get("/pets/:id", async (req, res) => {
     const {id} = req.params;
     try{
         const pet = await getPet(id);
-        if(JSON.stringify(pet) == '[]'){
-        res.status(400).send("No pet resides at that index");
-        } else {
-        res.send(pet);
-        }
+        // if(JSON.stringify(pet) == '[]'){
+        // res.status(400).send("No pet resides at that index");
+        // } else {
+            console.log(pet[0]);
+        res.render("pages/singlePet.ejs", {pet: pet[0]});
+        //}
     }
     catch(err) {
         res.status(400).send("Not an index");
@@ -55,15 +73,15 @@ app.get("/pets/:id", async (req, res) => {
         
 })
 
-app.post('/pets', async (req, res) => {
-    const { name, age, kind } = req.body
-    const queryParams = [age, name, kind]
+app.post('/pets/add', async (req, res) => {
+    const {name,age, kind}= req.body
+    const queryParams = [age, kind, name]
     try{
         await db.query("INSERT INTO pets VALUES (default, $1, $2, $3);", queryParams)
-        res.send(req.body)
+        res.render("pages/add", {response: `${name} was added!`});
     } 
     catch (err) {
-        res.status(400).send("Invalid pet. Expected input - {Name: String, Age: Integer, Kind: String}")
+        res.render("pages/add", {response: "Invalid pet. Expected input - {Name: String, Age: Integer, Kind: String}"});
     }
     
 });
@@ -71,6 +89,7 @@ app.post('/pets', async (req, res) => {
 app.patch('/pets/:id', async (req, res) => {
     const { id } = req.params;
     const petData = req.body
+    console.log(petData)
     try{
         let updatedVar =''
         for (let keys in petData) {
@@ -85,7 +104,7 @@ app.patch('/pets/:id', async (req, res) => {
     }   
 })
 
- app.delete('/pets/:id', async (req, res) => {
+ app.delete('/pets/:id/', async (req, res) => {
     const {id} = req.params;
     try{
         await db.query("DELETE FROM pets WHERE id = $1;", [id]);

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../partials/head'); %>
+</head>
+<body>
+  <header><%- include('../partials/header'); %></header>
+    <h1><%= pet.name %></h1>
+    <h2 style="text-align: center;">the <%= pet.kind %> is</h2>
+    <p style="font-size: 144px; text-align: center;"><%= pet.age %></p>
+    <button type="submit">Update</button><button type="submit">Delete</button>
+   
+</body>
+</html>

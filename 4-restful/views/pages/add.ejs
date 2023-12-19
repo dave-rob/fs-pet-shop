@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../partials/head'); %>
+</head>
+<body>
+  <header><%- include('../partials/header'); %></header>
+    <h1>Add a pet!</h1>
+    
+    <form action="/pets/add" method="post" id="addPet">
+        <input type="text" name="name" autofocus placeholder="<%= locals.error ? error :  'Enter pet name'%>">
+        <input type="text" name="kind" autofocus placeholder="<%= locals.error ? error :  'Enter pet kind'%>">
+        <input type="text" name="age" autofocus placeholder="<%= locals.error ? error :  'Enter pet age'%>">
+        <button type="submit">Add</button>
+      </form>
+
+      <p><%= response %></p>
+</body>
+</html>

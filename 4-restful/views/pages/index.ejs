@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../partials/head'); %>
+</head>
+<body>
+  <header><%- include('../partials/header'); %></header>
+    <h1>My Pet Shop!</h1>
+    <ul>
+        <% pets.forEach(function(pet) { %>
+          <li style="list-style-type: none;">
+            <a href="/pets/<%= pet.id %>"><strong><%= pet.name %></strong></a>
+            the <%= pet.kind %> is <%= pet.age %> years old.
+          </li>
+        <% }); %>
+      </ul>
+</body>
+</html>
