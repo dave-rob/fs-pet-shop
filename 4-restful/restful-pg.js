@@ -19,16 +19,30 @@ async function getPet(id){
     const pet = result.rows;
     return pet;
 }
+
+//set the engine for the view
 app.set('view engine', 'ejs');
+
+//lets you get req.body from forms
 app.use(express.urlencoded({ extended:true}));
+
 app.use(express.json())
-app.use(express.static("public"));
+
+//app.use(express.static("public"));
+
+//requires basic authorization
 app.use(basicAuth({
     users: { 'admin': 'meowmix'},
     challenge: true,//gives popup if try to go to browser
     unauthorizedResponse: req => (`unauthorized!`)
 }))
 
+//redirect you to /pets
+app.get("/", (req,res)=>{
+    res.redirect("/pets");
+})
+
+//loads up index.ejs with all pets when going to /pets
 app.get("/pets", async (req, res) => {
     try{
        let result = await db.query("SELECT * FROM pets;");
@@ -42,6 +56,7 @@ app.get("/pets", async (req, res) => {
     
 })
 
+//loads up add.ejs when you go to /add
 app.get("/add", async (req, res) => {
     try{
        //let result = await db.query("SELECT * FROM pets;");
@@ -55,6 +70,8 @@ app.get("/add", async (req, res) => {
     
 })
 
+
+//loads singlePet.ejs when you click on a pet
 app.get("/pets/:id", async (req, res) => {
     const {id} = req.params;
     try{
@@ -73,6 +90,7 @@ app.get("/pets/:id", async (req, res) => {
         
 })
 
+//posts a pet into the database and shows you if added or error
 app.post('/pets/add', async (req, res) => {
     const {name,age, kind}= req.body
     const queryParams = [age, kind, name]
@@ -86,25 +104,22 @@ app.post('/pets/add', async (req, res) => {
     
 });
 
+//updates the pet 
 app.post('/pets/:id/update', async (req, res) => {
     const { id } = req.params;
     const petData = req.body
-    console.log(petData)
+    //console.log(petData)
     try{
-        //let updatedVar =''
         for (let keys in petData) {
             if(petData[keys] != ''){
                 await db.query(`UPDATE pets SET ${keys} = $1 WHERE id = $2;`, [petData[keys], id])
             }
-            //console.log(keys, petData[keys], id);
-            
-            //updatedVar+= keys + " "
         }
-        //res.send(`${updatedVar} was updated!`)
         res.redirect(`/pets/${id}`)
     } catch(err){
-        console.error(err);
-        res.status(400).send("Bad request. {Name: String, Age: Integer, Kind: String}")
+        //console.error(err);
+        const pet = await getPet(id);
+        res.render("pages/singlePet.ejs",{pet: pet[0], error:"Bad request. {Name: String, Kind: String, Age: Integer}"})
     }   
 })
 
@@ -126,7 +141,7 @@ app.post('/pets/:id/update', async (req, res) => {
 //     }   
 // })
 
-
+//when the delet button is clicked, takes you to this site and then performs the query
 app.get('/pets/:id/delete', async (req, res) => {
     const {id} = req.params;
     try{
@@ -149,6 +164,7 @@ app.get('/pets/:id/delete', async (req, res) => {
 //     }
 //  })
 
+//catch all
  app.get('*', (req, res, next) => {
     next('Internal Server Error')
 })
